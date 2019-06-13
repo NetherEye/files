@@ -1,0 +1,10 @@
+React.js相对于Vue.js它的灵活性和协作性更好一点，所以我在处理复杂项目或公司核心项目时，React都是我的第一选择。
+而Vue.js有着丰富的API，实现起来更简单快速，所以当团队不大，沟通紧密时，我会选择Vue，因为它更快速更易用。
+（需要说明的是，其实Vue也完全胜任于大型项目，这要根据自己对框架的掌握程度来决定，以上只是站在我的知识程度基础上的个人总结）
+
+npm install -g create-react-app
+D:  //进入D盘
+mkdir ReactDemo  //创建ReactDemo文件夹
+create-react-app demo01   //用脚手架创建React项目
+cd demo01   //等创建完成后，进入项目目录
+npm start   //预览项目，如果能正常打开，说明项目创建成功

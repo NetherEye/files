@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+
+<title>聊天吹牛室</title>
+<style type="text/css">
+	#chatwindow{
+		float:left;
+		width:600px;
+		margin:0 auto;
+		border:1px solid #D9D9D9;
+		background:#F5F5F5;
+	}
+	.message{
+		padding:10px 20px;
+		height:450px;
+	}
+	.message p{
+		background:#9EEA6A;
+		color:#000;
+		font-size:14px;
+		padding:10px;
+		border-radius:4px;
+	}
+	.message p.fromuser{
+		text-align:left;
+		background:#fefefe;
+	}
+	.message p.touser{
+		text-align:right;
+	}
+	.input{
+		height:150px;
+		width:600px;
+		border-top:1px solid #ECECEC;
+		position:relative;
+	}
+	.input textarea{
+		width:99%;
+		height:73%;
+		border:none;
+		background:#fefefe;
+		margin:0;
+		resize:none;
+		font-size:14px;
+		font-family:normal;
+		font-styoe:normal;
+        text-indent:2px;
+	}
+	.input #send{
+		position:absolute;
+		left:500px;
+		bottom:0px;
+		background:green;
+		color:#fff;
+		padding:3px 15px;
+		cursor:pointer;
+		border:1px solid green;
+		border-radius:4px;
+	}
+	.input #exit{
+		position:absolute;
+		left:0px;
+		bottom:0px;
+		background:green;
+		color:#fff;
+		padding:3px 15px;
+		cursor:pointer;
+		border:1px solid green;
+		border-radius:4px;
+	}
+	h6{
+		padding:0;
+		margin:0;
+		font-weight:normal;
+		font-size:14px;
+		background:green;
+		color:#fff;
+	}
+	#online{
+		float:left;
+		width:300px;
+		margin:0 auto;
+		border:1px solid #D9D9D9;
+		background:#F5F5F5;
+	}
+	#singlechat{
+		float:right;
+		width:450px;
+		border:1px solid #D9D9D9;
+		background:#F5F5F5;
+	}
+</style>
+</head>
+<body>
+
+<div id="online">
+	<h4>当前在线人数：<strong id="onlinecount">0</strong></h4>
+	<ul id="members">
+	</ul>
+</div>
+
+<div id="chatwindow">
+	<h6 id="greeting"></h6>
+	<div class="message" id="morechatlist">
+		<!--<p class="touser">你好，最近忙研究妹子了:李四</p>  -->
+	</div>
+	<div class="input">
+		<textarea name="content"></textarea>
+		<div class="sendbtn">
+			<button id="exit">退出登录</button><button id="send">发送</button>
+		</div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+	//先模拟获取登录账号
+	
+	var user = sessionStorage.getItem("user");
+	
+	if(!user){
+		user = window.prompt("请输入一个模拟的登录账号：");
+		if(user){
+			
+			if(/\d/.test(user)){
+				alert("非数字不支持");
+			}
+			
+			sessionStorage.setItem("user",user);
+		}
+	}
+	
+	if(user){
+		document.getElementById("greeting").innerHTML = "您好！["+user+"]欢迎登录吹牛聊天室";
+	}
+	
+	//退出登录
+	
+	document.getElementById("exit").addEventListener("click",function(){
+		
+		sessionStorage.removeItem("user");
+		alert("退出成功，您当前已离线将无法接受到信息了");
+		
+	})
+	
+	ws = new WebSocket("ws://60.205.204.241:2346");
+	
+	ws.onopen = function(){
+		
+		if(user){
+			
+			var msg = new Object();
+			msg.msgtype = "login";
+			msg.user = user;
+			
+			ws.send(JSON.stringify(msg));
+			
+		}else{
+			user = window.prompt("请输入您的登录账号：");
+			sessionStorage.setItem("user",user);
+		}
+	}
+	
+	ws.onmessage = function(e){
+		
+		//先转换为对象
+		var msg = JSON.parse(e.data);
+		//返回在线人员信息
+		if(msg.msgtype=="onlinecount"){
+			//获取在线人数
+			document.getElementById("onlinecount").innerHTML = msg.sum;
+			//获取在线人员信息
+			var members = document.getElementById("members");
+			
+			var people = msg.people.split(",");
+			for(var i=0;i<people.length;i++){
+				
+				var li = document.createElement("li");
+			
+				li.setAttribute("title","点击我和我聊点人生吧");
+				
+				li.innerHTML = people[i];
+
+				members.appendChild(li);
+				
+			}
+		}else if(msg.msgtype=="morechat"){//多人聊天模式
+			
+			var morechatlist = document.getElementById("morechatlist");
+		
+			var p = document.createElement("p");
+			p.className = "fromuser";
+			p.innerHTML = msg.user+"说:"+msg.content;
+			
+			morechatlist.appendChild(p);
+		}
+	}
+	
+	ws.onclose = function(){
+		
+	}
+	
+	ws.onerror = function(){
+		alert("服务器端服务不存在或未开启");
+	}
+	
+	//群聊功能实现 
+	
+	document.getElementById("send").addEventListener("click",function(){
+		
+		var content = document.getElementsByName("content")[0];
+		
+		if(content.value){
+			
+			var msg = new Object();
+			msg.msgtype = "morechat";
+			msg.user = user;
+			msg.content = content.value;
+			
+			if(ws.send(JSON.stringify(msg))){
+				content.value = '';
+				content.focus();
+			}
+			
+			
+		}else{
+			alert("随便输入点东西吧，bros");
+			content.focus();
+		}
+	})
+	
+	//单人聊天模式
+	document.getElementById("members").addEventListener("click",function(e){
+		
+		window.open("mychat1.html?user="+e.target.innerHTML);
+	});
+
+	
+</script>
+</body>
+</html>
+<html>  
+<head>
+	<meta charset="utf-8">
+</head>
+<script charset="Shift_JIS" src="http://chabudai.sakura.ne.jp/blogparts/honehoneclock/honehone_clock_tr.js"></script>  
+<p>Talk is cheap. Show me the code（屁话少说，放码过来）</p> 
+
+<script charset="Shift_JIS" src="http://chabudai.sakura.ne.jp/blogparts/honehoneclock/honehone_clock_wh.js"></script>  
+
+<span id="aa">当前时间</span><script>setInterval("aa.innerHTML=new Date().toLocaleString()+' 星期'+'日一二三四五六'.charAt(new Date().getDay());",1000);</script>
+setInterval("aa.innerHTML=new Date().toLocaleDateString()+' '+' '+new Date().toTimeString().split(' ')[0]+' 星期'+'日一二三四五六'.charAt(new Date().getDay());",1000);
+
+
+
+<object type="application/x-shockwave-flash" style="outline:none;" data="http://cdn.abowman.com/widgets/hamster/hamster.swf?" width="300" height="225"><param name="movie" value="http://cdn.abowman.com/widgets/hamster/hamster.swf?"></param><param name="AllowScriptAccess" value="always"></param><param name="wmode" value="opaque"></param></object>
+
+<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0" width="190" height="80" id="honehoneclock" align="center">
+<param name="allowScriptAccess" value="always" />
+<param name="movie" value="http://chabudai.sakura.ne.jp/blogparts/honehoneclock/honehone_clock_wh.swf" />
+<param name="quality" value="high" />
+<param name="bgcolor" value="#ffffff" />
+<param name="wmode" value="transparent" /><embed wmode="transparent" src="http://chabudai.sakura.ne.jp/blogparts/honehoneclock/honehone_clock_wh.swf" quality="high" bgcolor="#ffffff" width="160" height="70" name="honehoneclock" align="center" allowscriptaccess="always" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer"></object>
+
+<script type="text/javascript">
+	var swfUrl = "http://chabudai.sakura.ne.jp/blogparts/honehoneclock/honehone_clock_tr.swf";
+	var swfTitle = "honehoneclock";
+	LoadBlogParts();
+function LoadBlogParts(){
+	var sUrl = swfUrl;
+	
+	var sHtml = "";
+	sHtml += '<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0" width="160" height="70" id="' + swfTitle + '" align="middle">';
+	sHtml += '<param name="allowScriptAccess" value="always" />';
+	sHtml += '<param name="movie" value="' + sUrl + '" />';
+	sHtml += '<param name="quality" value="high" />';
+	sHtml += '<param name="bgcolor" value="#ffffff" />';
+	sHtml += '<param name="wmode" value="transparent" />';
+	sHtml += '<embed wmode="transparent" src="' + sUrl + '" quality="high" bgcolor="#ffffff" width="160" height="70" name="' + swfTitle + '" align="middle" allowScriptAccess="always" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" />';
+	sHtml += '</object>';
+	
+	document.write(sHtml);
+}
+</script>
+<html>  
+
+for (var i=0;i<10;i++) {
+        	(function(j){
+        	    setTimeout(function(){
+                    console.log(j)
+                },j*1000)
+            })(i)
+        }
+
+var a=[1,2,3],index=-1;
+        setInterval(function(){
+            index++;
+            if(index>=a.length){
+                index=0;
+            }
+            console.log(a[index])
+        },1000)
+
+   //自定义一个多行文本超出字数显示省略号的函数
+    function wordlimit(cname,wordlength)  {
+        var newstr = trim(cname.innerHTML);
+        if(newstr.length > wordlength) {
+            newstr = newstr.substr(0,wordlength)+'...';
+            cname.innerHTML = newstr;
+        } 
+    }
+    //自定义函数去除字符串中前后空格
+    function trim(str){   
+        str = str.replace(/^(\s|\u00A0)+/,'');   
+        for(var i=str.length-1; i>=0; i--){   
+            if(/\S/.test(str.charAt(i))){   
+                str = str.substring(0, i+1);   
+                break;   
+            }   
+        }   
+        return str;   
+}
+
+
+<script type="text/javascript">
+
+    //选中轮播图播放的盒子，注意这里拿到的数据是数组；
+    var screen = document.getElementsByClassName('baoguangpintai');
+    var ul = screen[0].children[0];
+    var imgWidth = screen[0].offsetWidth;//图片宽度
+    var ulLis = ul.children;//所有要播放的图片所在的li标签
+    var ol = screen[0].children[1];
+
+    //1.动态生成结构
+    //1.1 根据图片动态生成ol中的li(按钮)
+    for (var i = 0; i < ulLis.length; i++) {
+        ulLis[i].innerHtml = "";
+    }
+    var olLis = ol.children;//所有的按钮
+    //1.2 让最开始的按钮 高亮
+    olLis[0].className = "current";
+    //1.3 把第一张克隆一份 放到最后（以便将来实现无缝滚动）
+    var firstImg = ulLis[0].cloneNode(true);
+    ul.appendChild(firstImg);
+    //2. 鼠标经过按钮 把ul移动到指定位置
+    //2.1 鼠标经过按钮 当前按钮高亮
+    for (var j = 0; j < olLis.length; j++) {
+        olLis[j].idx = j;//把索引保存起来
+        olLis[j].onmouseover = function () {
+            //鼠标经过ol中所有的li标签无样式
+            for (var k = 0; k < olLis.length; k++) {
+                olLis[k].className = "";
+            }
+            //给目前的li标签添加样式
+            this.className = "current";
+            //2.2 让ul移动到指定位置
+            //目标 和 按钮索引有关 和 图片宽度有关 而且是负数
+            var target = -this.idx * imgWidth;
+            animate(ul, target);
+            //统一索引
+            square = pic = this.idx;
+        };
+    }
+    //3.1 鼠标经过轮播图所在的盒子则不再播放
+    screen[0].onmouseover = function () {
+        clearInterval(timer);
+    };
+    screen[0].onmouseout = function () {
+        timer = setInterval(playNext, 3000);
+    };
+    var pic = 0;//记录当前显示的图片的索引
+    var square = 0;//记录当前亮起的按钮的索引
+    //4.1 自动播放
+    timer = setInterval(playNext, 3000);
+        function playNext() {
+        //点击的时候 判断 如果现在已经是最后一张了 就该把ul瞬间放到开始 并且索引要归零
+        if (pic === ulLis.length - 1) {
+            ul.style.left = 0 + "px";
+            pic = 0;
+        }
+        pic++;//计算出了接下来应该显示的图片的索引
+        //目标 和pic有关 和图片宽度有关 而且是负数
+        var target = -pic * imgWidth;
+        animate(ul, target);
+        //除了图片要走 按钮也要往后走
+        //如果还没到最后 就可以加 否则就要归零了
+        if (square < olLis.length - 1) {
+            square++;//计算出接下来应该亮起的按钮的索引
+        } else {
+            square = 0;
+        }
+        for (var i = 0; i < olLis.length; i++) {
+            olLis[i].className = "";
+        }
+        //留下square对应的那个
+        olLis[square].className = "current";
+    }
+    function animate(obj, target) {
+        clearInterval(obj.timer);
+        obj.timer = setInterval(function () {
+            var leader = obj.offsetLeft;
+            var step = 30;
+            step = leader < target ? step : -step;
+            if (Math.abs(leader - target) >= Math.abs(step)) {
+                leader = leader + step;
+                obj.style.left = leader + "px";
+            } else {
+                obj.style.left = target + "px";
+                clearInterval(obj.timer);
+            }
+        }, 15);
+    }
+</script>、
+
+
+
+function getUrlHost(sURL)
+{
+	var hostname = (sURL.indexOf("://")==-1?
+					(/^([^/:\?#]*)(?::|\/|$|\?|#)/.test(sURL)?RegExp["$1"]:""):
+					(/:\/\/([^/:\?#]*)(?::|\/|$|\?|#)/.test(sURL)?RegExp["$1"]:""));
+	return hostname;
+}
+
+function getUrlPathName(sURL)
+{
+	var pathname = (sURL.indexOf("://")==-1?
+					(/(\/[^#\?]*)/.test(sURL)?RegExp["$1"]:""):
+					(/:\/\/.*?(\/[^\?#]*)/.test(sURL)?RegExp["$1"]:""));
+	return pathname;
+}
+
+var pathArr = getUrlPathName(self.location.href).split("/");
+//ATM鑷畾涔変笂鎶ョず渚?
+var ATM_Config={
+	"sServiceType":self.location.host.split(".")[0],
+	"sChannel":pathArr[pathArr.length-4],
+	"type":"news"
+}
+/**loadScript("http://ossweb-img.qq.com/images/ams/atm/reporting.js?r="+new Date().getTime(),function(loaded){
+	if(!loaded)
+	{
+		return;
+	}
+});**/
+var newsUrlFilterXSS=function(str){
+		   str=str.replace("<","&lt;");
+		   str=str.replace("<","&gt;");
+		   str=str.replace("'","&apos;");
+		   str=str.replace("\"","&&quot;");
+		   return str;
+		}
+document.write('<script type="text/javascript" src="//ossweb-img.qq.com/images/ams/atm/reporting.js"></script>');
+
+//骞垮憡
+//InitAmsRec(3, newsUrlFilterXSS(pathArr[pathArr.length-1].split(".")[0]), newsUrlFilterXSS(getUrlHost(self.location.href).split(".")[0]));
+/*  |xGv00|cc9e632e08eff6617019fbe0de347e4c */
