@@ -8,3 +8,22 @@ mkdir ReactDemo  //创建ReactDemo文件夹
 create-react-app demo01   //用脚手架创建React项目
 cd demo01   //等创建完成后，进入项目目录
 npm start   //预览项目，如果能正常打开，说明项目创建成功
+
+umi
+# 安装
+$ yarn global add umi # 或者 npm install -g umi
+
+# 新建应用
+$ mkdir myapp && cd myapp
+
+# 新建页面
+$ umi generate page index
+
+# 本地开发
+$ umi dev
+
+# 构建上线
+$ umi build
+
+react动画
+https://motion.ant.design/index-cn
