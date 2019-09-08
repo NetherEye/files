@@ -1,0 +1,414 @@
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    font-family: 'arial';
+    background-color: #272822;
+    color: #ddd;
+}
+div, span, p, table, canvas, header, footer, nav, section, aside {
+    transition: all 0.3s ease-in-out;
+    -webkit-transition: all 0.3s ease-in-out;
+    -moz-transition: all 0.3s ease-in-out;
+    -ms-transition: all 0.3s ease-in-out;
+}
+
+.current {
+    color: #0f0;
+}
+.fail {
+    color: rgb(204,0,0);
+}
+header {
+    position: absolute;
+    top: 8px;
+    width: 100%;
+    height: 20px;
+    z-index: 99;
+}
+span#showControl {
+    margin: 2px;
+    color: #555;
+    cursor: pointer;
+    padding: 5px;
+    box-shadow: 0 0 3px #555;
+}
+span#showControl:hover {
+    color: green;
+}
+span#showControl:after {
+    cursor: pointer;
+    border: 1px solid #aaa;
+    border-radius: 50%;
+    content: url(../resource/img/mmplayer_16.png);
+    transition:all 0.3s ease-in-out;
+}
+span#showControl:hover:after {
+    border-color:green;
+}
+div.wrapper {
+    height: 100%;
+    width: 100%;
+}
+aside.control {
+    width: 250px;
+    height: 500px;
+    padding: 5px;
+    position: absolute;
+    top: 60px;
+    left: -1px;
+    box-shadow: 0 0 30px #555;
+    z-index: 99;
+     background-color: rgba(39,40,34,0.8);
+    transition: all 0.5s ease-in-out;
+    -webkit-transition: all 0.5s ease-in-out;
+    -moz-transition: all 0.5s ease-in-out;
+    -ms-transition: all 0.5s ease-in-out;
+}
+#action{
+  position: absolute;
+right: 0;
+width: 20px;
+top: 0;
+background: #ddd;
+height: 130px;
+padding-top: 80px;
+}
+div.overlay{
+    width: 260px;
+    height: 510px;
+    position: absolute;
+    top: 0px;
+    left: -1px;
+    z-index: 100;
+    background-color: rgba(28,28,28,0.9);
+    cursor: progress;
+}
+/*win8 style loading animation http://codepen.io/jameswyse/pen/uisvk*/
+.loader{
+    position: relative;
+    top: 100px;
+    left: 100px;
+}
+.loader .circle {
+  position: absolute;
+  width: 38px;
+  height: 38px;
+  opacity: 0;
+  transform: rotate(225deg);
+  animation-iteration-count: infinite;
+  animation-name: orbit;
+  animation-duration: 5.5s;
+    -webkit-transform: rotate(225deg);
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-name: orbit;
+  -webkit-animation-duration: 5.5s;
+    -moz-transform: rotate(225deg);
+  -moz-animation-iteration-count: infinite;
+  -moz-animation-name: orbit;
+  -moz-animation-duration: 5.5s;
+}
+.loader .circle:after {
+  content: '';
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 5px;
+  background: #fff;
+  /* Pick a color */
+}
+.loader .circle:nth-child(2) {
+  animation-delay: 240ms;
+  -webkit-delay: 240ms;
+  -moz-delay: 240ms;
+}
+.loader .circle:nth-child(3) {
+  animation-delay: 480ms;
+  -webkit-animation-delay: 480ms;
+  -moz-animation-delay: 480ms;
+}
+.loader .circle:nth-child(4) {
+  animation-delay: 720ms;
+  -webkit-animation-delay: 720ms;
+  -moz-animation-delay: 720ms;
+}
+.loader .circle:nth-child(5) {
+  animation-delay: 960ms;
+  -webkit-animation-delay: 960ms;
+  -moz-animation-delay: 960ms;
+}
+@keyframes orbit {
+  0% {
+    transform: rotate(225deg);
+    opacity: 1;
+    animation-timing-function: ease-out;
+  }
+  7% {
+    transform: rotate(345deg);
+    animation-timing-function: linear;
+  }
+  30% {
+    transform: rotate(455deg);
+    animation-timing-function: ease-in-out;
+  }
+  39% {
+    transform: rotate(690deg);
+    animation-timing-function: linear;
+  }
+  70% {
+    transform: rotate(815deg);
+    opacity: 1;
+    animation-timing-function: ease-out;
+  }
+  75% {
+    transform: rotate(945deg);
+    animation-timing-function: ease-out;
+  }
+  76% {
+    transform: rotate(945deg);
+    opacity: 0;
+  }
+  100% {
+    transform: rotate(945deg);
+    opacity: 0;
+  }
+}
+@-webkit-keyframes orbit {
+  0% {
+    -webkit-transform: rotate(225deg);
+    opacity: 1;
+    -webkit-animation-timing-function: ease-out;
+  }
+  7% {
+    -webkit-transform: rotate(345deg);
+    -webkit-animation-timing-function: linear;
+  }
+  30% {
+    -webkit-transform: rotate(455deg);
+    -webkit-animation-timing-function: ease-in-out;
+  }
+  39% {
+    -webkit-transform: rotate(690deg);
+    -webkit-animation-timing-function: linear;
+  }
+  70% {
+    -webkit-transform: rotate(815deg);
+    opacity: 1;
+    -webkit-animation-timing-function: ease-out;
+  }
+  75% {
+    -webkit-transform: rotate(945deg);
+    -webkit-animation-timing-function: ease-out;
+  }
+  76% {
+    -webkit-transform: rotate(945deg);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: rotate(945deg);
+    opacity: 0;
+  }
+}
+@-moz-keyframes orbit {
+  0% {
+    -moz-transform: rotate(225deg);
+    opacity: 1;
+    -moz-animation-timing-function: ease-out;
+  }
+  7% {
+    -moz-transform: rotate(345deg);
+    -moz-animation-timing-function: linear;
+  }
+  30% {
+    -moz-transform: rotate(455deg);
+    -moz-animation-timing-function: ease-in-out;
+  }
+  39% {
+    -moz-transform: rotate(690deg);
+    -moz-animation-timing-function: linear;
+  }
+  70% {
+    -moz-transform: rotate(815deg);
+    opacity: 1;
+    -moz-animation-timing-function: ease-out;
+  }
+  75% {
+    -moz-transform: rotate(945deg);
+    -moz-animation-timing-function: ease-out;
+  }
+  76% {
+    -moz-transform: rotate(945deg);
+    opacity: 0;
+  }
+  100% {
+    -moz-transform: rotate(945deg);
+    opacity: 0;
+  }
+}
+
+
+aside.control ul, aside.control ol {
+    margin: 0;
+}
+aside ul#controlPanel {
+    text-align: center;
+    height: 100px;
+    padding: 5px;
+}
+aside ul#controlPanel li {
+    display: inline-block;
+    list-style: none;
+    margin: 5px;
+    cursor: pointer;
+}
+aside ul#controlPanel li:hover, aside ol#playlist span.title:hover {
+    color: #fefefe;
+    text-decoration: underline;
+}
+aside ul#controlPanel li.play:hover {
+    text-decoration: none;
+}
+aside ul#controlPanel li.play {
+    display: block;
+}
+div.controlBtn{
+      font-size: 1.5em;
+    font-weight: bold;
+    margin: 0;
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    border-radius: 50%;
+    background-color: #555;
+    margin: 0 auto;
+    display: inline-block;
+}
+div.controlBtn:hover{
+     color: #000;
+    background-color: #999;
+    text-decoration: none;
+}
+
+aside p.winTitle {
+    margin: 5px;
+}
+aside p.winTitle span#close {
+    float: right;
+    cursor: pointer;
+}
+aside p.winTitle span#close:hover {
+    color: rgb(204, 0, 0);
+}
+/*custom the file upload input*/
+
+div.add {
+    width: 29px;
+    height: 18px;
+    overflow: hidden;
+    display: inline-table;
+}
+div.add input {
+    display: block !important;
+    width: 29px !important;
+    height: 18px !important;
+    opacity: 0 !important;
+    overflow: hidden !important;
+    cursor: pointer;
+}
+div.add label {
+    cursor: pointer;
+}
+div.add label:hover {
+    text-decoration: underline;
+}
+/*end custom the file upload input*/
+
+div.dividLine {
+    width: 100%;
+    height: 1px;
+    background: #555;
+    background: -webkit-gradient(linear, 0 0, 100% 0, from(#272822), to(#272822), color-stop(50%, #111));
+    background: linear-gradient(90deg, #272822, #111 50%, #272822);
+}
+aside ol#playlist {
+    height: 360px;
+    overflow: auto;
+    white-space: nowrap;
+    background-color: rgba(38,39,34,0.8);
+    border: 1px solid #232323;
+}
+aside ol#playlist li {
+    cursor: pointer;
+}
+aside ol#playlist li span.remove {
+    color: #555;
+    padding: 0 5px 0 0;
+}
+aside ol#playlist li span.remove:hover {
+    color: rgb(204, 0, 0);
+}
+div#visualizer {
+    text-align: center;
+}
+div#visualizer #canvas {
+    margin-top: 4%;
+}
+ footer {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+}
+
+canvas#mirror{
+    opacity: 0.5;
+    position: relative;
+    top: -66px;
+    -webkit-transform: scaleY(-0.5);
+    -moz-transform: scaleY(-0.5);
+    -ms-transform: scaleY(-0.5);
+    transform: scaleY(-0.5);
+}
+div#mirrorWrapper{
+    height: 150px;
+}
+/*gradient transparency http://hammerspace.co.uk/2012/02/css3-gradients-with-transparency*/
+div#mirrorWrapper:after {
+    display: block;
+height: 150px;
+width: 100%;
+position: relative;
+top: -257px;
+content: " ";
+background: -moz-linear-gradient(top,rgba(39,40,34,0) 0%, rgba(39,40,34,1) 75%);
+background: -webkit-linear-gradient(top,rgba(39,40,34,0) 0%, rgba(39,40,34,1) 75%);
+background: -o-linear-gradient(top,rgba(39,40,34,0) 0%, rgba(39,40,34,1) 75%);
+background: -ms-linear-gradient(top,rgba(39,40,34,0) 0%, rgba(39,40,34,1) 75%);
+background: linear-gradient(top,rgba(39,40,34,0) 0%, rgba(39,40,34,1) 75%);
+}
+
+#time a{
+  color:#398E08;
+}
+
+/*custom scrollbar for webkit browsers*/
+#playlist::-webkit-scrollbar-track
+{
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  border-radius: 15px;
+  background-color: #F5F5F5;
+}
+
+#playlist::-webkit-scrollbar
+{
+  width: 5px;
+  height: 5px;
+    border-radius: 15px;
+  background-color: #F5F5F5;
+}
+
+#playlist::-webkit-scrollbar-thumb
+{
+  border-radius: 15px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+  background-color: #BCBCBC;
+}
